@@ -1,0 +1,160 @@
+go课程第四天
+
+2017/12/16
+
+Author lipd
+--------------------------------------------------------
+switch不带break 如果想接着判断下一个case，可以使用fullthrough
+
+切片指定值
+var b [] int = [10] int {1,2,3,8:10}
+第八个值为10
+--------------------------------------------------------
+指针存的是地址,指针声明后自身的地址是不会变的，里面存的地址可以改变
+指针的定义：1 使用其他变量的地址赋值 2 使用new
+var b *int b = &a 或 p = new(int)
+指针必须初始化，不能对空地址进行操作
+
+取值 赋值使用*
+	var a int
+	a = 10
+	var b *int
+	fmt.Println(a)
+	fmt.Printf("%p\n",b)//输出b的值
+	fmt.Println(&b)//输出b的地址
+
+	 b = &a
+	fmt.Println(*b)
+     *b = 100
+     fmt.Println(*b)
+     fmt.Println(a)
+
+使用场景：修改函数传进来的参数的值
+
+不能直接给空内存的指针赋值
+var p *int //声明是不会分配内存的
+*p = 100
+这样会报错
+
+var p *int
+var b int
+p = &b
+*p = 200//b = 200
+
+
+func test3()  {
+	var p *int
+	var b int
+	p = &b
+	*p = 200
+	p = new(int)
+	*p = 1000
+}
+--------------------------------------------------------
+new用来分配值空间，返回地址。new的时候不会初始化，是空的
+make用来分配引用类型空间 chan、map、splice。 make会初始化
+make与new的区别
+--------------------------------------------------------
+函数
+没有返回值的时候也可以return
+go里面不支持重载，一个包里不能有两个相同名称的函数
+
+全局变量：整个包下都可以访问
+--------------------------------------------------------
+type
+用来定义自定义类型
+自定义类型不能和go自有的类型自由转换，例如定义
+type Int int
+var a Int
+var b int
+a和b不能做操作
+函数也是一种类型
+type add_func fun(int,int)int
+     类型名    类型
+--------------------------------------------------------
+函数参数的传递方式
+1.值传递
+2.引用传递
+值传递和引用传递，传递给函数的都是变量的副本，
+值传递是值的拷贝，引用传递是地址的拷贝。一般来说地址拷贝更为高效
+
+map、slice、chan、指针、interface默认是以引用的方式传递
+函数在声明了返回值的名称和类型后，函数执行完可以直接return
+
+func add(a, b int) (c int) {
+    c = a+b
+    return
+}
+--------------------------------------------------------
+defer
+1.当函数返回时执行defer语句
+2.多个defer语句按照先进后出的方式执行
+3.defer语句声明的变量，在其声明时就决定了
+
+作用：
+1.关闭文件句柄
+2.锁资源释放
+3.数据库连接释放
+--------------------------------------------------------
+递归的效率低于for循环，因为他需要压栈
+递归的设计原则
+1.一个大的问题能够分解成相似的小问题
+2.定义好出口条件
+--------------------------------------------------------
+闭包
+一个函数和与其相关的引用环境组合而成的实体
+闭包=函数+引用环境
+example：
+func main() {
+	var add = Adder()
+	fmt.Println(add(1))
+	fmt.Println(add(20))
+	fmt.Println(add(300))
+}
+
+func Adder() func(i int) int{
+	var x int
+	return func(j int) int {
+		x += j //x的生命周期一直在，相当于成员变量，只要Adder没被销毁，x就一直在
+		return x
+	}
+}
+结果输出 1 21 321
+
+什么时候使用闭包？
+--------------------------------------------------------
+使用sort包进行排序、搜索操作（二分查找）
+--------------------------------------------------------
+map 引用类型,作为参数传递到函数内，函数对其进行改变的话会改变原始值
+字典
+map是无序的
+声明
+var map1 map[keytype] valuetype
+var a map[string]string
+var a map[string]map[string]string
+
+example：
+func main() {
+
+	//var a map[string]string = map[string]string{"hello", "world"}
+	a := make(map[string]string,10)//必须make，为其分配内存
+	a["hello"] = "world"  //插入，大于10时会自动扩容
+	val, ok := a["hello"] //查找，返回值和bool
+	if ok {
+		fmt.Println(val)
+	}
+
+	delete(a, "hello")//删除
+	fmt.Println(a)
+}
+map的切片
+func sliceOfMap(){
+	items:= make([]map[int]int, 5)
+	for i := 0; i <= len(items); i++{
+		items[i] = make(map[int]int,10)
+	}
+	items[0][1] = 10
+	fmt.Println(items)
+}
+
+go git的包放在gopath下
